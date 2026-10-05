@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 OLLAMA_MODEL_NAME = os.getenv("OLLAMA_MODEL_NAME", "gemma4:31b-cloud")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_EMBED_MODEL_NAME = os.getenv("OLLAMA_EMBED_MODEL_NAME", "nomic-embed-text")
-OLLAMA_EMBED_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_EMBED_BASE_URL = os.getenv("OLLAMA_EMBED_BASE_URL", "http://localhost:11434")
 
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://neo4j:7687")
 NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "neo4j")
