@@ -1,0 +1,11 @@
+llama-index
+llama-index-readers-file
+llama-index-vector-stores-qdrant
+llama-index-graph-stores-neo4j
+llama-index-embeddings-ollama
+llama-index-llms-ollama
+qdrant-client
+neo4j
+tree_sitter
+tree_sitter_languages
+tree-sitter-language-pack
