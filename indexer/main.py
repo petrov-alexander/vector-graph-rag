@@ -1,10 +1,10 @@
 import os
 import logging
 import nest_asyncio
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import SimpleDirectoryReader, PropertyGraphIndex
 from llama_index.core.node_parser import CodeSplitter, SentenceSplitter, MarkdownNodeParser
-from llama_index.llms.ollama import Ollama
-from llama_index.embeddings.ollama import OllamaEmbedding
+from llama_index.llms.openai_like import OpenAILike
 from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 import qdrant_client
@@ -14,10 +14,10 @@ nest_asyncio.apply()
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-OLLAMA_MODEL_NAME = os.getenv("OLLAMA_MODEL_NAME", "gemma4:31b-cloud")
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_EMBED_MODEL_NAME = os.getenv("OLLAMA_EMBED_MODEL_NAME", "nomic-embed-text")
-OLLAMA_EMBED_BASE_URL = os.getenv("OLLAMA_EMBED_BASE_URL", "http://localhost:11434")
+LLM_URL = os.getenv("LLM_URL", "http://localhost:8000/v1")
+LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "qwen3.6:35b")
+
+EMBED_MODEL_NAME = os.getenv("EMBED_MODEL_NAME", "intfloat/multilingual-e5-small")
 
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://neo4j:7687")
 NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "neo4j")
@@ -80,16 +80,12 @@ EXCLUDE_DIRS = {
 }
 
 
-llm = Ollama(
-    model=OLLAMA_MODEL_NAME,
-    base_url=OLLAMA_BASE_URL,
+llm = OpenAILike(
+    model=LLM_MODEL_NAME,
+    api_base=LLM_URL,
     request_timeout=300.0,
-    is_function_calling_model=True
-)
-
-embed_model = OllamaEmbedding(
-    model_name=OLLAMA_EMBED_MODEL_NAME,
-    base_url=OLLAMA_EMBED_BASE_URL
+    api_key="fake",
+    context_window=65535,
 )
 
 graph_store = Neo4jPropertyGraphStore(
@@ -153,6 +149,8 @@ for doc in documents:
     logger.warning(f"No splitter configured for file: {full_path}")
 
 logger.info(f"Extracted {len(nodes)} structural blocks. Starting vector and graph index construction...")
+
+embed_model = HuggingFaceEmbedding(model_name=EMBED_MODEL_NAME)
 
 index = PropertyGraphIndex(
     nodes=nodes,
